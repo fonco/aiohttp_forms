@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>{{ title }}</h1>
+    <form action="{{ path }}" method="post" accept-charset="utf-8"
+          enctype="application/x-www-form-urlencoded">
+
+        {% for key, field in fields.items() %}
+            <p>
+                <label for="{{ key }}">{{ field.name }}</label><br>
+                <input id="{{ key }}" name="{{ key }}" type="{{ field.type }}" value="{{ field.value }}"/>
+            </p>
+        {% endfor %}
+        <input type="submit" value="send"/>
+    </form>
+{% endblock %}
