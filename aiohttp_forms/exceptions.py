@@ -1,0 +1,2 @@
+class FormDoesntExist(Exception):
+    pass

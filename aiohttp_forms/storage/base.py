@@ -15,5 +15,8 @@ class BaseStorage:
     async def create_form(self, form: dict) -> str:
         raise NotImplementedError
 
+    async def remove_form(self, form_id: str):
+        raise NotImplementedError
+
     async def get_form(self, form_id: str):
         raise NotImplementedError

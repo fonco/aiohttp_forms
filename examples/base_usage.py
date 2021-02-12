@@ -2,32 +2,26 @@ from aiohttp import web
 
 import logging
 
-from aiohttp_forms.dispatcher import Dispatcher
+from aiohttp_forms import exceptions
+from aiohttp_forms.executor import Executor
+from aiohttp_forms.settings import STORAGE_KEY
+from aiohttp_forms.storage import BaseStorage
 
 
-async def form_handler(request: web.Request):  # TODO The handler is called twice.
-    data = await request.post()
-    form_id = request.match_info['form_id']
-    storage = request.app['storage']
-    form = await storage.get_form(form_id=form_id)
-    chat, user = form.get('chat'), form.get('user')
+async def form_handler(data: dict, storage: BaseStorage, form_id: str):
     print(data)
-    print(chat, user)
+    print(storage)
+    try:
+        await storage.remove_form(form_id)
+    except exceptions.FormDoesntExist:
+        return 'Form does not exist'
+    else:
+        return 'Biba'
 
 
-async def main():
-    logging.basicConfig(level=logging.DEBUG)
-    app = web.Application()
-    web_path = 'form-{form_id}/'
-    dp = Dispatcher(
-        app=app,
-        path=web_path,
-    )
-    await dp.register_handler(form_handler)
+async def main(app: web.Application):
     form = {
         'title': 'Example Form',
-        'chat': 1,
-        'user': 1,
         'fields': {
             'first_name': {
                 'name': 'First Name',
@@ -39,13 +33,13 @@ async def main():
                 'type': 'text',
                 'value': '',
             },
-        }
+        },
+        'button': 'SEND',
     }
-    form_id = await dp.storage.create_form(form=form)
-    path = dp.path.format(form_id=form_id)
-    print(path)
-    return app
+    form_id = await app[STORAGE_KEY].create_form(form=form)
+    print(form_id)
 
 
 if __name__ == '__main__':
-    web.run_app(main())
+    logging.basicConfig(level=logging.DEBUG)
+    Executor(path='form-{form_id}/', handler=form_handler, on_startup=main).run()

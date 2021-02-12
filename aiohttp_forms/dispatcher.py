@@ -4,15 +4,16 @@ import aiohttp_jinja2
 from jinja2 import FileSystemLoader
 from aiohttp import web
 
-from .handlers import get_page
+from .views import MainView
 from .storage import BaseStorage, MemoryStorage
 from .types import WebHandler
-from .settings import DEFAULT_PATH, BASE_DIR
+from .settings import DEFAULT_PATH, BASE_DIR, HANDLER_KEY, FORMAT_VALUE, STORAGE_KEY
 
 
 class Dispatcher:
     def __init__(
-            self, app: Optional[web.Application] = None,
+            self,
+            app: Optional[web.Application] = None,
             path: Optional[str] = None,
             storage: Optional[BaseStorage] = None
     ) -> NoReturn:
@@ -23,8 +24,9 @@ class Dispatcher:
         if not storage:
             storage = MemoryStorage(path)
         self.storage = storage
-        app['storage'] = storage
+        app[STORAGE_KEY] = storage
         self._setup_jinja()
+        self.handler = None
 
     @property
     def app(self) -> web.Application:
@@ -44,15 +46,14 @@ class Dispatcher:
             path = DEFAULT_PATH
         elif not path.startswith('/'):
             path = '/' + path
-        if '{form_id}' not in path:
-            raise ValueError("The 'path' argument needs to contain the '{form_id}' string")
+        if FORMAT_VALUE not in path:
+            raise ValueError("The 'path' argument needs to contain the '{value}' string".format(value=FORMAT_VALUE))
 
         return path
 
     def _set_routes(self) -> NoReturn:
-        self._app.router.add_get(path=self._path, handler=get_page)
+        self._app.router.add_view(self._path, MainView)
 
-    async def register_handler(self, handler: WebHandler) -> NoReturn:
-        self._app.router.add_post(path=self._path, handler=handler)
-        for route in self._app.router.routes():
-            print(route, route.handler)
+    def register_handler(self, handler: WebHandler) -> NoReturn:
+        self._app[HANDLER_KEY] = handler
+        self.handler = handler
