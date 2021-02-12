@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiohttp-forms"
-version = "0.0.1dev2"
+version = "0.0.1dev3"
 description = ""
 authors = ["F0rzend <github.com/F0rzend>"]
 
