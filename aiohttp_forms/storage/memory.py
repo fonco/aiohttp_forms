@@ -40,4 +40,4 @@ class MemoryStorage(BaseStorage):
             raise exceptions.FormDoesntExist
 
     async def get_form(self, form_id: str) -> dict:
-        return self.forms.get(form_id)
+        return self.forms.get(form_id, None)

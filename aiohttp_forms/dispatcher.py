@@ -1,3 +1,4 @@
+import logging
 from typing import Optional, NoReturn
 
 import aiohttp_jinja2
@@ -52,6 +53,7 @@ class Dispatcher:
         return path
 
     def _set_routes(self) -> NoReturn:
+        logging.debug(f'Routes have been installed on {self._path}')
         self._app.router.add_view(self._path, MainView)
 
     def register_handler(self, handler: WebHandler) -> NoReturn:

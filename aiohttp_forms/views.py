@@ -10,15 +10,19 @@ class MainView(web.View):
     async def get(self):
         form_id = self.request.match_info[FORMAT_VALUE]
         storage: BaseStorage = self.request.app[STORAGE_KEY]
-        return await storage.get_form(form_id=form_id)
+        form = await storage.get_form(form_id=form_id)
+        if not form:
+            return web.json_response({'error': 'form not found'})
+        return form
 
     async def post(self):
         form_id = self.request.match_info[FORMAT_VALUE]
         app = self.request.app
         storage = app[STORAGE_KEY]
         data = await self.request.post()
+        data = {key: value for key, value in data.items()}
         handler = app[HANDLER_KEY]
         error = await handler(data=data, storage=storage, form_id=form_id)
         if error:
-            return {'error': error}
-        return None
+            return web.json_response({'success': False, 'error': error})
+        return web.json_response({'success': True})

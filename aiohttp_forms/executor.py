@@ -40,5 +40,9 @@ class Executor:
         self._app = app
         self._storage = storage
 
+    @property
+    def app(self):
+        return self._app
+
     def run(self) -> NoReturn:
         web.run_app(self._app)

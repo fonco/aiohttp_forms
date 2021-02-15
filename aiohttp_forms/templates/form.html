@@ -10,7 +10,6 @@
                 <input id="{{ key }}" name="{{ key }}" type="{{ field.type }}" value="{{ field.value }}"/>
             </p>
         {% endfor %}
-        {% if error %}<div class="error" style="color: red;"><strong>Error:</strong> {{ error }}</div>{% endif %}
-        <input type="submit" value="send"/>
+        <input type="submit" value="{{ button }}"/>
     </form>
 {% endblock %}

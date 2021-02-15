@@ -10,13 +10,10 @@ from aiohttp_forms.storage import BaseStorage
 
 async def form_handler(data: dict, storage: BaseStorage, form_id: str):
     print(data)
-    print(storage)
     try:
         await storage.remove_form(form_id)
     except exceptions.FormDoesntExist:
         return 'Form does not exist'
-    else:
-        return 'Biba'
 
 
 async def main(app: web.Application):
